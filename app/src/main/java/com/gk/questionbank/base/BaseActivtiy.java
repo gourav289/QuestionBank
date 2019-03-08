@@ -19,7 +19,7 @@ public abstract class BaseActivtiy extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(setLayout());
-//        unbinder=ButterKnife.bind(this);
+//        unbinder= ButterKnife.bind(this);
     }
 
 

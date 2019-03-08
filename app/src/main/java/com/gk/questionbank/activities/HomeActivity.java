@@ -22,7 +22,7 @@ public class HomeActivity extends BaseActivtiy implements FragmentCallBacks {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         HomeFragment mFragment=new HomeFragment();
-        addFragmentHome(mFragment,true);
+        addFragmentHome(mFragment,false);
         mFragment.setFragmentListener(this);
     }
 
