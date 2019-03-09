@@ -56,6 +56,7 @@ public class AddFragment extends BaseFragment {
             public void onClick(View view) {
                 Questions questions=getData();
                 if(getData()!=null) {
+                    popBackStack();
                     Bundle bundle = new Bundle();
                     bundle.putParcelable(HomeActivity.QUESTIONS_DATA,questions );
                     Fragment mFragment = new HomeFragment();

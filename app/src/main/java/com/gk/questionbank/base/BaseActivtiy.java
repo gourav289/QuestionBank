@@ -41,6 +41,9 @@ public abstract class BaseActivtiy extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
+
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

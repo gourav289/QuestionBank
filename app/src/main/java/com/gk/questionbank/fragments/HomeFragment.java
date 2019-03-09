@@ -22,9 +22,12 @@ import com.gk.questionbank.R;
 import com.gk.questionbank.activities.HomeActivity;
 import com.gk.questionbank.adapters.QuestionsAdapter;
 import com.gk.questionbank.base.BaseFragment;
+import com.gk.questionbank.callbacks.DialogClickListener;
 import com.gk.questionbank.callbacks.FragmentCallBacks;
 import com.gk.questionbank.callbacks.RecyclerListener;
 import com.gk.questionbank.enums.FragmentOperation;
+import com.gk.questionbank.enums.RVClickType;
+import com.gk.questionbank.utils.CommonDialogs;
 import com.gk.questionbank.view_model.Questions;
 import com.gk.questionbank.view_model.QuestionsViewModel;
 
@@ -32,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class HomeFragment extends BaseFragment implements RecyclerListener<Questions> {
+public class HomeFragment extends BaseFragment implements RecyclerListener<Questions>, DialogClickListener<Questions> {
 
 //    @BindView(R.id.rv_questions)
     RecyclerView rvQuestions;
@@ -50,15 +53,16 @@ public class HomeFragment extends BaseFragment implements RecyclerListener<Quest
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         questionsViewModel= ViewModelProviders.of(getActivity()).get(QuestionsViewModel.class);
+        if(savedInstanceState==null) {
+            Bundle bundle = getArguments();
+            if (bundle != null) {
+                questionsData = bundle.getParcelable(HomeActivity.QUESTIONS_DATA);
+                if (questionsData != null) {
+                    questionsViewModel.insert(questionsData);
+                    Toast.makeText(getActivity(), "Data Inserted", Toast.LENGTH_SHORT).show();
+                }
 
-        Bundle bundle=getArguments();
-        if(bundle!=null) {
-            questionsData = bundle.getParcelable(HomeActivity.QUESTIONS_DATA);
-            if(questionsData!=null) {
-                questionsViewModel.insert(questionsData);
-                Toast.makeText(getActivity(), "Data Inserted", Toast.LENGTH_SHORT).show();
             }
-
         }
 
 
@@ -80,12 +84,14 @@ public class HomeFragment extends BaseFragment implements RecyclerListener<Quest
         rvQuestions.setAdapter(questionsAdapter);
         rvQuestions.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        questionsViewModel.getAllQuestions().observe(getActivity(), new Observer<List<Questions>>() {
-            @Override
-            public void onChanged(@Nullable List<Questions> questions) {
-                questionsAdapter.notifyData(questions);
-            }
-        });
+//        questionsViewModel.getAllQuestions().observe(getActivity(), new Observer<List<Questions>>() {
+//            @Override
+//            public void onChanged(@Nullable List<Questions> questions) {
+//                questionsAdapter.notifyData(questions);
+//            }
+//        });
+        String searchKey="%"+edSearch.getText().toString().trim()+"%";
+        getFilteredData(searchKey);
 
     }
 
@@ -115,12 +121,9 @@ public class HomeFragment extends BaseFragment implements RecyclerListener<Quest
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                if(TextUtils.isEmpty(edSearch.getText().toString().trim()){
-//
-//                }else{
-//
-//                }
-//                getFilteredData(edSearch.getText().toString().trim());
+                questionsAdapter.notifySearchedText(edSearch.getText().toString().trim());
+                String searchKey="%"+edSearch.getText().toString().trim()+"%";
+                getFilteredData(searchKey);
             }
 
             @Override
@@ -148,12 +151,24 @@ public class HomeFragment extends BaseFragment implements RecyclerListener<Quest
 
 
     @Override
-    public void onClick(Questions model) {
+    public void onClick(Questions model, RVClickType clickType) {
+        if(clickType==RVClickType.CLICK) {
             Bundle bundle = new Bundle();
-        bundle.putParcelable(HomeActivity.QUESTIONS_DATA,model );
-        Fragment mFragment = new QuestionDetailsFragment();
-        mFragment.setArguments(bundle);
-        if (mFragmentCallBacks != null)
-            mFragmentCallBacks.onNewFragment(FragmentOperation.REPLACE, mFragment, true);
+            bundle.putParcelable(HomeActivity.QUESTIONS_DATA, model);
+            Fragment mFragment = new QuestionDetailsFragment();
+            mFragment.setArguments(bundle);
+            if (mFragmentCallBacks != null)
+                mFragmentCallBacks.onNewFragment(FragmentOperation.REPLACE, mFragment, true);
+        }else if(clickType==RVClickType.EDIT){
+
+        }else if (clickType==RVClickType.DELETE){
+            CommonDialogs.showDialog(getActivity(),getString(R.string.delete_message),clickType,model,this);
+        }
+    }
+
+    @Override
+    public void onDialogClick(Questions model, RVClickType clickType) {
+        if(clickType==RVClickType.DELETE)
+            questionsViewModel.delete(model);
     }
 }

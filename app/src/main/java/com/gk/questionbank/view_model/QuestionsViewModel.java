@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
+import com.gk.questionbank.async_tasks.DeleteAsyncTask;
 import com.gk.questionbank.async_tasks.InsertAsyncTask;
 
 import java.util.List;
@@ -23,6 +24,10 @@ public class QuestionsViewModel extends AndroidViewModel {
 
     public void insert(Questions questions){
         new InsertAsyncTask(questionsDao).execute(questions);
+    }
+
+    public void delete(Questions questions){
+        new DeleteAsyncTask(questionsDao).execute(questions);
     }
 
     public LiveData<List<Questions>> getAllQuestions(){

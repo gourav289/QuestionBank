@@ -3,6 +3,7 @@ package com.gk.questionbank.view_model;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
@@ -19,5 +20,8 @@ public interface QuestionsDao {
 
     @Query("SELECT * FROM questions WHERE question LIKE :q")
     LiveData<List<Questions>> getFilteredQuestions(String q);
+
+    @Delete
+    int delete(Questions question);
 
 }
